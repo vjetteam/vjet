@@ -108,10 +108,6 @@ public class JstCache {
 			return false;
 		}
 
-		if (m_types.containsKey(key)){
-			return false;
-		}
-		
 		m_types.put(key, type);
 		return true;
 	}

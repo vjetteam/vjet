@@ -77,7 +77,7 @@ public class MtdInvocationExpr extends BaseJstNode implements IExpr, IStmt {
 			}
 			
 			if (type instanceof IJstRefType) {
-				return ((IJstRefType)type).getReferencedNode();
+				return ((IJstRefType)type);
 			}
 		}
 		

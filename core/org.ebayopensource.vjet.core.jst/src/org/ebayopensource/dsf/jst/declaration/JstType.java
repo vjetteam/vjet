@@ -124,6 +124,7 @@ public class JstType extends BaseJstNode implements IJstType {
 			setPackage(new JstPackage(name.substring(0, index)));
 			setSimpleName(name.substring(index+1));
 		} else {
+			setPackage(new JstPackage());
 			setSimpleName(name);
 		}
 	}

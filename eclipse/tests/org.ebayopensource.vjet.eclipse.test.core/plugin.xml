@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+   <extension
+         point="org.ebayopensource.vjet.eclipse.core.typeconstruct">
+      <resolver
+            class="org.ebayopensource.vjet.eclipse.core.typeconstruct.NoOpTypeConstructorResolver"
+            key="Foo::defineType"
+            name="Foo::defineType_Resolver">
+         <description>
+            This is a no operation (dummy) type constructor resolver.
+         </description>
+      </resolver>
+   </extension>
+
+</plugin>

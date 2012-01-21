@@ -8,18 +8,24 @@
  *******************************************************************************/
 package org.ebayopensource.vjet.eclipse.core;
 
+import java.util.Collection;
+
 import org.ebayopensource.dsf.jstojava.controller.JstParseController;
+import org.ebayopensource.dsf.jstojava.resolver.TypeConstructorRegistry;
 import org.ebayopensource.vjet.eclipse.core.builder.TypeSpaceBuilder;
 import org.ebayopensource.vjet.eclipse.core.parser.VjoParserToJstAndIType;
 import org.ebayopensource.vjet.eclipse.core.ts.EclipseTypeSpaceLoader;
 import org.ebayopensource.vjet.eclipse.core.ts.JstLibResolver;
 import org.ebayopensource.vjet.eclipse.core.ts.TypeSpaceLoadJob;
+import org.ebayopensource.vjet.eclipse.core.typeconstruct.TypeConstructResolverExtension;
+import org.ebayopensource.vjet.eclipse.core.typeconstruct.TypeConstructResolverExtensionRegistry;
 import org.ebayopensource.vjet.eclipse.core.validation.DefaultValidator;
 import org.ebayopensource.vjet.eclipse.internal.core.SerBuildPathEntry;
 import org.ebayopensource.vjo.lib.IResourceResolver;
 import org.ebayopensource.vjo.lib.LibManager;
 import org.ebayopensource.vjo.tool.typespace.TypeSpaceMgr;
 import org.eclipse.core.runtime.Assert;
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Platform;
@@ -46,40 +52,44 @@ public class VjetPlugin extends Plugin {
 	public static final String VJO_SUBFIX = ".js";
 	public final static String VJETVALIDATION = "VJETVALIDATION";
 	private TypeSpaceMgr m_typeSpaceMgr = TypeSpaceMgr.getInstance();
-	public static final String SDK_CONTAINER = "org.ebayopensource.vjet.eclipse.core" + ".SDK_CONTAINER";
+	public static final String SDK_CONTAINER = "org.ebayopensource.vjet.eclipse.core"
+			+ ".SDK_CONTAINER";
 	public static final String ID_DEFAULT_SDK = "DEFUALT_SDK";
 	public static final String JS_DEFAULT_SDK = "org.ebayopensource.vjet.eclipse.core.JSNATIVE_CONTAINER";
 	public static final String JS_DEFAULT_SDK_LABEL = "JS Native Types";
 	public static final String DES_VJET_SDK = "VJET SDK";
 
-	public static final String JSNATIVESDK_ID = PLUGIN_ID + ".JSNATIVE_CONTAINER";
+	public static final String JSNATIVESDK_ID = PLUGIN_ID
+			+ ".JSNATIVE_CONTAINER";
 
 	public static final String BROWSERSDK_LABEL = "Browser SDK";
 
 	public static final String BROWSERSDK_ID = "org.ebayopensource.vjet.eclipse.core.BROWSER_CONTAINER";
 
 	public static final String VJOLIB_ID = "org.ebayopensource.vjet.eclipse.core.VJO_CONTAINER";
-	
+
 	public static final String VJOLIB_LABEL = "VJO LIB";
 
 	public static final String BUILDER_ID = PLUGIN_ID + ".builder";
 
 	public static final boolean DEBUG = Boolean
-	.valueOf(Platform.getDebugOption("org.eclipse.dltk.mod.core/debug")).booleanValue(); //$NON-NLS-1$
+			.valueOf(Platform.getDebugOption("org.eclipse.dltk.mod.core/debug")).booleanValue(); //$NON-NLS-1$
 
-	public static final boolean DEBUG_SCRIPT_BUILDER =  Boolean
-	.valueOf(Platform.getDebugOption("org.ebayopensource.vjet.eclipse.core/debugScriptBuilder")).booleanValue(); //$NON-NLS-1$
+	public static final boolean DEBUG_SCRIPT_BUILDER = Boolean
+			.valueOf(
+					Platform.getDebugOption("org.ebayopensource.vjet.eclipse.core/debugScriptBuilder")).booleanValue(); //$NON-NLS-1$
 
 	public static final boolean TRACE_SCRIPT_BUILDER = Boolean
-	.valueOf(Platform.getDebugOption("org.ebayopensource.vjet.eclipse.core/traceScriptBuilder")).booleanValue(); //$NON-NLS-1$
-	
+			.valueOf(
+					Platform.getDebugOption("org.ebayopensource.vjet.eclipse.core/traceScriptBuilder")).booleanValue(); //$NON-NLS-1$
+
 	public static final boolean TRACE_TYPESPACE = Boolean
-	.valueOf(Platform.getDebugOption("org.ebayopensource.vjet.eclipse.core/typespace")).booleanValue(); //$NON-NLS-1$
+			.valueOf(
+					Platform.getDebugOption("org.ebayopensource.vjet.eclipse.core/typespace")).booleanValue(); //$NON-NLS-1$
 
-	public static final boolean TRACE_PARSER =  Boolean
-	.valueOf(Platform.getDebugOption("org.ebayopensource.vjet.eclipse.core/traceParser")).booleanValue(); //$NON-NLS-1$
-
-
+	public static final boolean TRACE_PARSER = Boolean
+			.valueOf(
+					Platform.getDebugOption("org.ebayopensource.vjet.eclipse.core/traceParser")).booleanValue(); //$NON-NLS-1$
 
 	private TypeSpaceLoadJob m_loadJob = new TypeSpaceLoadJob();
 
@@ -104,28 +114,30 @@ public class VjetPlugin extends Plugin {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.eclipse.core.runtime.Plugins#start(org.osgi.framework.BundleContext)
+	 * @see
+	 * org.eclipse.core.runtime.Plugins#start(org.osgi.framework.BundleContext)
 	 */
 	@Override
 	public void start(BundleContext context) throws Exception {
 		super.start(context);
-		
+
 		IResourceResolver jstLibResolver = JstLibResolver.getInstance()
-			.setSdkEnvironment(PiggyBackClassPathUtil.getSdkEnvironment());
-		
+				.setSdkEnvironment(PiggyBackClassPathUtil.getSdkEnvironment());
+
 		LibManager.getInstance().setResourceResolver(jstLibResolver);
 
 		m_typeSpaceMgr.setTypeLoader(loader);
 		JstParseController controller = VjoParserToJstAndIType
 				.getJstParseController();
 		m_typeSpaceMgr.init(controller);
-		
-		TypeSpaceBuilder.addGroupEventListeners(m_typeSpaceMgr.getController().getJstTypeSpaceMgr());
-		
-		if(VjetPlugin.TRACE_TYPESPACE){
+
+		TypeSpaceBuilder.addGroupEventListeners(m_typeSpaceMgr.getController()
+				.getJstTypeSpaceMgr());
+
+		if (VjetPlugin.TRACE_TYPESPACE) {
 			addTraceGroupEventListeners();
 		}
-		
+
 		setPluginInstance(this);
 		DefaultValidator.getValidator();
 		m_loadJob.addJobChangeListener(new JobChangeAdapter() {
@@ -134,11 +146,40 @@ public class VjetPlugin extends Plugin {
 				loader.setStarted(true);
 			}
 		});
+		
+		initTypeCostructorRegistry();
+		
 		m_loadJob.schedule();
+		
 	}
 
+	private void initTypeCostructorRegistry() {
+
+		TypeConstructorRegistry registry = TypeConstructorRegistry
+				.getInstance();
+
+		TypeConstructResolverExtensionRegistry extensionRegistry = new TypeConstructResolverExtensionRegistry();
+		Collection<TypeConstructResolverExtension> extensions = extensionRegistry
+				.getResolverExtensions();
+		for (TypeConstructResolverExtension extension : extensions) {
+			try {
+				registry.addResolver(extension.getKey(),
+						extension.createResolver());
+			} catch (CoreException e) {
+				VjetPlugin
+						.getDefault()
+						.getLog()
+						.log(new Status(IStatus.ERROR, VjetPlugin.PLUGIN_ID,
+								"Error intializing the " + extension.toString()
+										+ " resolver.", e));
+			}
+		}
+		
+	}
+	
 	private void addTraceGroupEventListeners() {
-		TypeSpaceBuilder.addGroupTraceEventListeners(m_typeSpaceMgr.getController().getJstTypeSpaceMgr());
+		TypeSpaceBuilder.addGroupTraceEventListeners(m_typeSpaceMgr
+				.getController().getJstTypeSpaceMgr());
 	}
 
 	// Modify by Oliver, 2009-12-01, fix findbugs bug.
@@ -149,7 +190,8 @@ public class VjetPlugin extends Plugin {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.eclipse.core.runtime.Plugin#stop(org.osgi.framework.BundleContext)
+	 * @see
+	 * org.eclipse.core.runtime.Plugin#stop(org.osgi.framework.BundleContext)
 	 */
 	@Override
 	public void stop(BundleContext context) throws Exception {
